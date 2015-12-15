@@ -7,8 +7,8 @@
  */
 package com.intellij.lang.jsgraphql.ide.notifications;
 
+import com.google.common.io.ByteStreams;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.jsgraphql.JSGraphQLFileType;
 import com.intellij.lang.jsgraphql.JSGraphQLParserDefinition;
 import com.intellij.lang.jsgraphql.ide.project.JSGraphQLLanguageUIProjectService;
@@ -34,7 +34,6 @@ import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.EditorNotifications;
 import com.intellij.ui.EditorNotifications.Provider;
 import com.intellij.util.ui.UIUtil;
-import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,7 +94,7 @@ public class JSGraphQLConfigEditorNotificationProvider extends Provider implemen
         if(!isGraphQLRelatedFile(file)) {
             return false;
         }
-        if(JSGraphQLNodeLanguageServiceInstance.getNodeInterpreter(myProject) == null) {
+        if(JSGraphQLNodeLanguageServiceInstance.getNodeInterpreter() == null) {
             // didn't configure node yet
             return false;
         }
@@ -108,9 +107,6 @@ public class JSGraphQLConfigEditorNotificationProvider extends Provider implemen
 
     protected boolean isGraphQLRelatedFile(VirtualFile file) {
         if(file.getFileType() == JSGraphQLFileType.INSTANCE) {
-            return true;
-        }
-        if(JavaScriptFileType.getFileTypesCompilableToJavaScript().contains(file.getFileType())) {
             return true;
         }
         return false;
@@ -166,7 +162,7 @@ public class JSGraphQLConfigEditorNotificationProvider extends Provider implemen
                     try(OutputStream stream = fileRef.get().getOutputStream(this)) {
                         try(InputStream inputStream = pluginDescriptor.getPluginClassLoader().getResourceAsStream("/META-INF/"+resourceName)) {
                             if(inputStream != null) {
-                                IOUtils.copy(inputStream, stream);
+                                ByteStreams.copy(inputStream, stream);
                             }
                         }
                     }

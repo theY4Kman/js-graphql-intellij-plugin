@@ -12,9 +12,7 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElementWeigher;
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.jsgraphql.icons.JSGraphQLIcons;
-import com.intellij.lang.jsgraphql.ide.injection.JSGraphQLLanguageInjectionUtil;
 import com.intellij.lang.jsgraphql.languageservice.JSGraphQLNodeLanguageServiceClient;
 import com.intellij.lang.jsgraphql.languageservice.api.Hint;
 import com.intellij.lang.jsgraphql.languageservice.api.HintsResponse;
@@ -22,12 +20,10 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.util.PlatformIcons;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.Objects;
 import java.util.Set;
 
 
@@ -41,13 +37,12 @@ public class JSGraphQLCompletionContributor extends CompletionContributor {
             @Override
             protected void addCompletions(@NotNull final CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
 
-                final boolean relay = JSGraphQLLanguageInjectionUtil.isRelayInjection(parameters.getOriginalFile());
                 final String buffer = parameters.getOriginalFile().getText();
                 final Editor editor = parameters.getEditor();
                 final Project project = editor.getProject();
                 final LogicalPosition logicalPosition = editor.offsetToLogicalPosition(parameters.getOffset());
 
-                final HintsResponse hints = JSGraphQLNodeLanguageServiceClient.getHints(buffer, logicalPosition.line, logicalPosition.column, project, relay);
+                final HintsResponse hints = JSGraphQLNodeLanguageServiceClient.getHints(buffer, logicalPosition.line, logicalPosition.column, project, false);
 
                 if(hints != null) {
 

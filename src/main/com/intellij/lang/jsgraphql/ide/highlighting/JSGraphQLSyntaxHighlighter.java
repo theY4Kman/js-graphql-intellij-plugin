@@ -11,7 +11,6 @@ import com.intellij.lang.jsgraphql.JSGraphQLTokenTypes;
 import com.intellij.lang.jsgraphql.lexer.JSGraphQLLexer;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.openapi.project.Project;
@@ -22,19 +21,19 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
 
 public class JSGraphQLSyntaxHighlighter extends SyntaxHighlighterBase {
 
-    public static final TextAttributesKey KEYWORD = createTextAttributesKey("JSGRAPHQL.KEYWORD", TextAttributesKey.find("JS.KEYWORD"));
-    public static final TextAttributesKey PUNCTUATION = createTextAttributesKey("JSGRAPHQL.PUNCTUATION", TextAttributesKey.find("JS.BRACKETS"));
-    public static final TextAttributesKey PROPERTY = createTextAttributesKey("JSGRAPHQL.PROPERTY", TextAttributesKey.find("JS.INSTANCE_MEMBER_VARIABLE"));
-    public static final TextAttributesKey DEF = createTextAttributesKey("JSGRAPHQL.DEF", TextAttributesKey.find("JS.GLOBAL_FUNCTION"));
-    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("JSGRAPHQL.ATTRIBUTE", TextAttributesKey.find("JS.PARAMETER"));
-    public static final TextAttributesKey VARIABLE = createTextAttributesKey("JSGRAPHQL.VARIABLE", TextAttributesKey.find("JS.INSTANCE_MEMBER_VARIABLE"));
-    public static final TextAttributesKey QUALIFIER = createTextAttributesKey("JSGRAPHQL.QUALIFIER", TextAttributesKey.find("JS.GLOBAL_FUNCTION"));
-    public static final TextAttributesKey NUMBER = createTextAttributesKey("JSGRAPHQL.NUMBER", TextAttributesKey.find("JS.NUMBER"));
-    public static final TextAttributesKey STRING = createTextAttributesKey("JSGRAPHQL.STRING", TextAttributesKey.find("JS.STRING"));
-    public static final TextAttributesKey BUILTIN = createTextAttributesKey("JSGRAPHQL.BUILTIN", TextAttributesKey.find("JS.KEYWORD"));
-    public static final TextAttributesKey COMMENT = createTextAttributesKey("JSGRAPHQL.COMMENT", TextAttributesKey.find("JS.LINE_COMMENT"));
-    public static final TextAttributesKey ATOM = createTextAttributesKey("JSGRAPHQL.ATOM", TextAttributesKey.find("JS.CLASS"));
-    public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("JSGRAPHQL.BADCHARACTER", TextAttributesKey.find("JS.BADCHARACTER"));
+    public static final TextAttributesKey KEYWORD = createTextAttributesKey("JSGRAPHQL.KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
+    public static final TextAttributesKey PUNCTUATION = createTextAttributesKey("JSGRAPHQL.PUNCTUATION", DefaultLanguageHighlighterColors.BRACES);
+    public static final TextAttributesKey PROPERTY = createTextAttributesKey("JSGRAPHQL.PROPERTY", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+    public static final TextAttributesKey DEF = createTextAttributesKey("JSGRAPHQL.DEF", DefaultLanguageHighlighterColors.CLASS_NAME);
+    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("JSGRAPHQL.ATTRIBUTE", DefaultLanguageHighlighterColors.PARAMETER);
+    public static final TextAttributesKey VARIABLE = createTextAttributesKey("JSGRAPHQL.VARIABLE", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
+    public static final TextAttributesKey QUALIFIER = createTextAttributesKey("JSGRAPHQL.QUALIFIER", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION);
+    public static final TextAttributesKey NUMBER = createTextAttributesKey("JSGRAPHQL.NUMBER", DefaultLanguageHighlighterColors.NUMBER);
+    public static final TextAttributesKey STRING = createTextAttributesKey("JSGRAPHQL.STRING", DefaultLanguageHighlighterColors.STRING);
+    public static final TextAttributesKey BUILTIN = createTextAttributesKey("JSGRAPHQL.BUILTIN", DefaultLanguageHighlighterColors.KEYWORD);
+    public static final TextAttributesKey COMMENT = createTextAttributesKey("JSGRAPHQL.COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
+    public static final TextAttributesKey ATOM = createTextAttributesKey("JSGRAPHQL.ATOM", DefaultLanguageHighlighterColors.CLASS_NAME);
+    public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("JSGRAPHQL.BADCHARACTER", DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE);
 
 
     private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};

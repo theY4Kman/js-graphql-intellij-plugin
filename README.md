@@ -1,8 +1,8 @@
 ![](docs/js-graphql-logo.png)
 
-# JS GraphQL IntelliJ Plugin
+# JS GraphQL IntelliJ Plugin for Android Studio
 
-GraphQL language support including Relay.QL tagged templates in JavaScript and TypeScript.
+**Experimental** GraphQL language support for Android Studio.
 
 It provides the following features in IntelliJ IDEA and WebStorm:
 
@@ -16,19 +16,21 @@ It depends on [js-graphql-language-service](https://github.com/jimkyndemeyer/js-
 
 ## Features demo
 
-![](docs/js-graphql-webstorm-demo.gif)
+![](android-studio/demo.png)
 
 ## FAQ
 
 **Where can I get the plugin?**
 
-The plugin is available from the JetBrains Plugin Repository at https://plugins.jetbrains.com/plugin/8097?pr=
+The plugin version for Android Studio is currently considered experimental and has not yet been published to the JetBrains Plugin Repository.
 
-To install it in IntelliJ IDEA or WebStorm, open "Settings", "Plugins", "Browse repositories..." and search for "JS GraphQL".
+Download the [js-graphql-intellij-plugin.jar](android-studio/0.1.0/js-graphql-intellij-plugin.jar) directly from this `android-studio` branch. 
+
+To install it in Android Studio, open "Settings", "Plugins", "Install plugin from disk..."
 
 **How do I reload a GraphQL Schema that was loaded from a URL?**
 
-In the the GraphQL tool window, select the "Current Errors" tab and click the "Restart JS GraphQL Language Service" button. 
+In the the GraphQL tool window, select the "Console" tab and click the "Restart JS GraphQL Language Service" button. 
 
 ## License
 MIT

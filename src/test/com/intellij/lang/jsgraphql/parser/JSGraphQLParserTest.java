@@ -29,7 +29,7 @@ public class JSGraphQLParserTest extends ParsingTestCase {
         super.setUp();
         // TODO: This test depends on a running JS GraphQL Language service at http://localhost:3000
         CodeMirrorNodeLanguageServiceClientTest.setLanguageServiceUrl(new URL("http", "localhost", 3000, JSGraphQLNodeLanguageServiceInstance.JSGRAPHQL_LANGUAGE_SERVICE_MAPPING));
-        getApplication().addComponent(ProjectManager.class, new ProjectManagerImpl(new ProgressManagerImpl()));
+        getApplication().addComponent(ProjectManager.class, new ProjectManagerImpl(null/*TODO*/, null, new ProgressManagerImpl()));
     }
 
     @Override

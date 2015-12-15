@@ -7,7 +7,9 @@
  */
 package com.intellij.lang.jsgraphql.ide.configuration;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.intellij.lang.jsgraphql.ide.endpoints.JSGraphQLEndpoint;
@@ -18,13 +20,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -100,11 +101,13 @@ public class JSGraphQLConfigurationProvider extends VirtualFileAdapter {
     private JSGraphQLConfiguration getConfiguration(VirtualFile file) {
         try {
             try(InputStream inputStream = file.getInputStream()) {
-                final String json = IOUtils.toString(inputStream, "UTF-8");
-                try {
-                    return new Gson().fromJson(json, JSGraphQLConfiguration.class);
-                } catch (JsonSyntaxException je) {
-                    log.warn("Invalid JSON in config file", je);
+                try(InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charsets.UTF_8)) {
+                    final String json =  CharStreams.toString(inputStreamReader);
+                    try {
+                        return new Gson().fromJson(json, JSGraphQLConfiguration.class);
+                    } catch (JsonSyntaxException je) {
+                        log.warn("Invalid JSON in config file", je);
+                    }
                 }
             }
         } catch (IOException e) {

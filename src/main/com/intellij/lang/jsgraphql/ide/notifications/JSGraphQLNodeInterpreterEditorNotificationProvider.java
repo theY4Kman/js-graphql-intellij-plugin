@@ -7,9 +7,7 @@
  */
 package com.intellij.lang.jsgraphql.ide.notifications;
 
-import com.intellij.ide.actions.ShowSettingsUtilImpl;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.jsgraphql.JSGraphQLFileType;
 import com.intellij.lang.jsgraphql.JSGraphQLParserDefinition;
 import com.intellij.lang.jsgraphql.languageservice.JSGraphQLNodeLanguageServiceInstance;
@@ -24,7 +22,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.EditorNotifications;
 import com.intellij.ui.EditorNotifications.Provider;
-import com.jetbrains.nodejs.settings.NodeSettingsConfigurable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,8 +74,8 @@ public class JSGraphQLNodeInterpreterEditorNotificationProvider extends Provider
         if(!isGraphQLRelatedFile(file)) {
             return false;
         }
-        if(JSGraphQLNodeLanguageServiceInstance.getNodeInterpreter(myProject) != null) {
-            // already configured node
+        if(JSGraphQLNodeLanguageServiceInstance.getNodeInterpreter() != null) {
+            // found the node instance on the system path
             return false;
         }
         return GlobalSearchScope.projectScope(myProject).accept(file);
@@ -86,9 +83,6 @@ public class JSGraphQLNodeInterpreterEditorNotificationProvider extends Provider
 
     protected boolean isGraphQLRelatedFile(VirtualFile file) {
         if(file.getFileType() == JSGraphQLFileType.INSTANCE) {
-            return true;
-        }
-        if(JavaScriptFileType.getFileTypesCompilableToJavaScript().contains(file.getFileType())) {
             return true;
         }
         return false;
@@ -108,18 +102,9 @@ public class JSGraphQLNodeInterpreterEditorNotificationProvider extends Provider
         return color != null ? color : panel.getBackground();
     }
 
-    @NotNull
-    protected Runnable getConfigureAction() {
-        return () -> {
-            ShowSettingsUtilImpl.showSettingsDialog(myProject, NodeSettingsConfigurable.ID, "Node interpreter");
-            myNotifications.updateAllNotifications();
-        };
-    }
-
     protected class NodeInterpreterEditorNotificationPanel extends EditorNotificationPanel {
         public NodeInterpreterEditorNotificationPanel(final VirtualFile file) {
-            setText("Please configure the Node.js interpreter to enable GraphQL language features.");
-            createActionLabel("Configure...", getConfigureAction());
+            setText("Please ensure that a Node.js interpreter is added to your system path to enable GraphQL language features.");
             createActionLabel("Ignore", getDismissAction());
         }
 

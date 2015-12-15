@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 import com.intellij.codeInsight.documentation.DocumentationManagerProtocol;
 import com.intellij.lang.documentation.DocumentationProviderEx;
 import com.intellij.lang.jsgraphql.JSGraphQLTokenTypes;
-import com.intellij.lang.jsgraphql.ide.injection.JSGraphQLLanguageInjectionUtil;
 import com.intellij.lang.jsgraphql.languageservice.JSGraphQLNodeLanguageServiceClient;
 import com.intellij.lang.jsgraphql.languageservice.api.TokenDocumentationResponse;
 import com.intellij.lang.jsgraphql.languageservice.api.TypeDocumentationResponse;
@@ -72,13 +71,12 @@ public class JSGraphQLDocumentationProvider extends DocumentationProviderEx {
                 final String buffer = element.getContainingFile().getText();
                 final LogicalPosition pos = getTokenPos(buffer, element);
                 if(elementType == JSGraphQLTokenTypes.PROPERTY) {
-                    final boolean relay = JSGraphQLLanguageInjectionUtil.isRelayInjection(element.getContainingFile());
                     final TokenDocumentationResponse tokenDocumentation = JSGraphQLNodeLanguageServiceClient.getTokenDocumentation(
                             buffer,
                             pos.line,
                             pos.column,
                             editor.getProject(),
-                            relay
+                            false
                     );
                     if (tokenDocumentation != null) {
                         String doc = "";

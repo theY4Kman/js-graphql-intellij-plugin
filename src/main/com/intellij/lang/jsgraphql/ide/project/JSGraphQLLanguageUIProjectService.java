@@ -20,10 +20,6 @@ import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonFileType;
-import com.intellij.lang.javascript.compiler.JSLanguageCompilerResult;
-import com.intellij.lang.javascript.compiler.ui.JSLanguageCompilerToolWindowManager;
-import com.intellij.lang.javascript.compiler.ui.JSLanguageErrorTreeViewPanel;
-import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.lang.jsgraphql.JSGraphQLFileType;
 import com.intellij.lang.jsgraphql.icons.JSGraphQLIcons;
 import com.intellij.lang.jsgraphql.ide.actions.JSGraphQLEditEndpointsAction;
@@ -59,7 +55,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiUtilCore;
+import com.intellij.psi.PsiManager;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.OnePixelSplitter;
@@ -68,8 +64,6 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.impl.ContentImpl;
-import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.containers.ImmutableList;
 import com.intellij.util.ui.UIUtil;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -87,7 +81,6 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -122,13 +115,10 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
 
     private static final String FILE_URL_PROPERTY = "fileUrl";
 
-    private final JSLanguageCompilerToolWindowManager myToolWindowManager;
-    private boolean myToolWindowManagerInitialized = false;
+    private final JSGraphQLLanguageCompilerToolWindowManager myToolWindowManager;
 
     @NotNull
     private final Project myProject;
-
-    private final Map<String, ImmutableList<JSLanguageCompilerResult>> fileUriToErrors = Maps.newConcurrentMap();
 
     private final Object myLock = new Object();
 
@@ -151,7 +141,7 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
         };
 
         // tool window
-        myToolWindowManager = new JSLanguageCompilerToolWindowManager(project, GRAPH_QL_TOOL_WINDOW_NAME, GRAPH_QL_TOOL_WINDOW_NAME, JSGraphQLIcons.UI.GraphQLNode, restartInstanceAction);
+        myToolWindowManager = new JSGraphQLLanguageCompilerToolWindowManager(project, GRAPH_QL_TOOL_WINDOW_NAME, GRAPH_QL_TOOL_WINDOW_NAME, JSGraphQLIcons.UI.GraphQLNode, restartInstanceAction);
         Disposer.register(this, this.myToolWindowManager);
 
         // listen for editor file tab changes to update the list of current errors
@@ -187,14 +177,6 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
         });
     }
 
-    public void logErrorsInCurrentFile(@NotNull PsiFile file, List<JSLanguageCompilerResult> errors) {
-        final ImmutableList<JSLanguageCompilerResult> errorsList = ContainerUtil.immutableList(errors);
-        fileUriToErrors.put(file.getVirtualFile().getUrl(), errorsList);
-        UIUtil.invokeLaterIfNeeded(() -> {
-            myToolWindowManager.logCurrentErrors(errorsList, false);
-        });
-    }
-
     public void connectToProcessHandler(OSProcessHandler processHandler) {
         UIUtil.invokeLaterIfNeeded(() -> {
             myToolWindowManager.connectToProcessHandler(processHandler);
@@ -224,10 +206,6 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
 
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-        VirtualFile file = event.getNewFile();
-        if(file != null) {
-            logErrorsForFile(file, false);
-        }
     }
 
 
@@ -477,22 +455,6 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
 
     // -- instance management --
 
-    private void logErrorsForFile(VirtualFile file, boolean forceRefresh) {
-        ImmutableList<JSLanguageCompilerResult> currentErrors = fileUriToErrors.get(file.getUrl());
-        if(currentErrors != null) {
-            if(forceRefresh) {
-                myToolWindowManager.logCurrentErrors(ContainerUtil.immutableList(Collections.emptyList()), false);
-            }
-            myToolWindowManager.logCurrentErrors(currentErrors, false);
-        } else {
-            // files we don't know the errors for
-            if(myToolWindowManagerInitialized) {
-                // don't attempt to log errors until the view is ready
-                myToolWindowManager.logCurrentErrors(ContainerUtil.immutableList(Collections.emptyList()), false);
-            }
-        }
-    }
-
     private void restartInstance() {
 
         synchronized(this.myLock) {
@@ -506,13 +468,13 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
                     if(editor != null) {
                         final VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
                         if(file != null) {
-                            final PsiFile psiFile = PsiUtilCore.getPsiFile(myProject, file);
+                            final PsiManager psiManager = PsiManager.getInstance(myProject);
+                            final PsiFile psiFile = psiManager.findFile(file);
                             if(psiFile != null) {
-                                if(psiFile instanceof JSFile || psiFile instanceof JSGraphQLFile) {
+                                if(psiFile instanceof JSGraphQLFile) {
                                     DaemonCodeAnalyzer.getInstance(myProject).restart(psiFile);
                                 }
                             }
-                            logErrorsForFile(file, true); // force true to re-show the errors for the same file
                         }
                     }
                 });
@@ -540,8 +502,6 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
             final Editor editor = ((TextEditor) fileEditor).getEditor();
             final EditorEx editorEx = (EditorEx)editor;
 
-            // set read-only mode
-            editorEx.setViewer(true);
             editorEx.getSettings().setShowIntentionBulb(false);
             editor.getSettings().setAdditionalLinesCount(0);
             editor.getSettings().setCaretRowShown(false);
@@ -595,18 +555,8 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
 
                 myToolWindowManager.init();
 
-                // we don't support project-level errors yet, so close any error tree view panels initially
                 final ToolWindow toolWindow = ToolWindowManager.getInstance(myProject).getToolWindow(GRAPH_QL_TOOL_WINDOW_NAME);
                 if(toolWindow != null) {
-                    for (Content content : toolWindow.getContentManager().getContents()) {
-                        if(content.isCloseable() && content.getComponent() instanceof JSLanguageErrorTreeViewPanel) {
-                            toolWindow.getContentManager().removeContent(content, true);
-                        }
-                    }
-
-                    // show the current errors tab as empty
-                    myToolWindowManager.logCurrentErrors(ContainerUtil.immutableList(Collections.emptyList()), false);
-
                     // don't want the console and the current errors to be closed
                     for (Content content : toolWindow.getContentManager().getContents()) {
                         content.setCloseable(false);
@@ -614,7 +564,6 @@ public class JSGraphQLLanguageUIProjectService implements Disposable, FileEditor
 
                     createToolWindowResultEditor(toolWindow);
                 }
-                myToolWindowManagerInitialized = true;
             }, myProject.getDisposed()));
         }
     }

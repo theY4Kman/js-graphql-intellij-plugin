@@ -7,16 +7,18 @@
  */
 package com.intellij.lang.jsgraphql.languageservice;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.intellij.lang.jsgraphql.languageservice.api.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -87,9 +89,11 @@ public class JSGraphQLNodeLanguageServiceClient {
                     return null;
                 }
                 try(InputStream inputStream = httpConnection.getInputStream()) {
-                    String jsonResponse = IOUtils.toString(inputStream, "UTF-8");
-                    R response = new Gson().fromJson(jsonResponse, responseClass);
-                    return response;
+                    try(InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charsets.UTF_8)) {
+                        String jsonResponse = CharStreams.toString(inputStreamReader);
+                        R response = new Gson().fromJson(jsonResponse, responseClass);
+                        return response;
+                    }
                 }
             } else {
                 log.warn("Got error from JS GraphQL Language Service: HTTP " + httpConnection.getResponseCode() + ": " + httpConnection.getResponseMessage());

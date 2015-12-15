@@ -7,6 +7,7 @@
  */
 package com.intellij.lang.jsgraphql.languageservice;
 
+import com.google.common.io.ByteStreams;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.OSProcessHandler;
@@ -15,10 +16,11 @@ import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
-import com.intellij.javascript.nodejs.NodeDetectionUtil;
-import com.intellij.javascript.nodejs.NodeSettingsUtil;
 import com.intellij.lang.jsgraphql.JSGraphQLDebugUtil;
 import com.intellij.lang.jsgraphql.ide.project.JSGraphQLLanguageUIProjectService;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -32,7 +34,6 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.net.NetUtils;
 import com.intellij.util.ui.UIUtil;
-import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -43,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 public class JSGraphQLNodeLanguageServiceInstance implements ProjectManagerListener {
 
-    public static final String JSGRAPHQL_INTELLIJ_PLUGIN_ID = "com.intellij.lang.jsgraphql";
+    public static final String JSGRAPHQL_ANDROID_STUDIO_INTELLIJ_PLUGIN_ID = "com.intellij.lang.jsgraphql.android.studio";
     public static final String JSGRAPHQL_LANGUAGE_SERVICE_DIST_JS = "js-graphql-language-service.dist.js";
     public static final String JSGRAPHQL_LANGUAGE_SERVICE_MAPPING = "/js-graphql-language-service";
 
@@ -80,25 +81,20 @@ public class JSGraphQLNodeLanguageServiceInstance implements ProjectManagerListe
 
     }
 
-    public static String getNodeInterpreter(Project project) {
-        String interpreterPath = NodeSettingsUtil.getInterpreterPath(project);
-        if(interpreterPath == null) {
-            File interpreterInPath = NodeDetectionUtil.findInterpreterInPath();
-            if(interpreterInPath != null) {
-                interpreterPath = interpreterInPath.getAbsolutePath();
-            }
+    public static String getNodeInterpreter() {
+        final File interpreterInPath = NodeDetectionUtil.findInterpreterInPath();
+        if(interpreterInPath != null) {
+            return interpreterInPath.getAbsolutePath();
         }
-        return interpreterPath;
+        return null;
     }
 
     private void createProcessHandler() {
 
         // Make sure we have a node interpreter
-        final String nodeInterpreter = getNodeInterpreter(project);
+        final String nodeInterpreter = getNodeInterpreter();
         if (nodeInterpreter == null) {
-            if(log.isDebugEnabled()) {
-                log.debug("Can't create process handler: No Node.js interpreter configured.");
-            }
+            Notifications.Bus.notify(new Notification("GraphQL", "GraphQL", "Can't create process handler: No Node.js interpreter found on system path.", NotificationType.ERROR), project);
             return;
         }
 
@@ -200,7 +196,7 @@ public class JSGraphQLNodeLanguageServiceInstance implements ProjectManagerListe
                     return jsGraphQLNodeLanguageServiceFileName;
                 }
 
-                final IdeaPluginDescriptor pluginDescriptor = PluginManager.getPlugin(PluginId.getId(JSGRAPHQL_INTELLIJ_PLUGIN_ID));
+                final IdeaPluginDescriptor pluginDescriptor = PluginManager.getPlugin(PluginId.getId(JSGRAPHQL_ANDROID_STUDIO_INTELLIJ_PLUGIN_ID));
                 if (pluginDescriptor != null) {
                     final String workingDir;
                     boolean isJar = !pluginDescriptor.getPath().isDirectory();
@@ -228,7 +224,7 @@ public class JSGraphQLNodeLanguageServiceInstance implements ProjectManagerListe
                     }
                 } else {
                     if(log.isDebugEnabled()) {
-                        log.debug("No plugin descriptor for " + JSGRAPHQL_INTELLIJ_PLUGIN_ID);
+                        log.debug("No plugin descriptor for " + JSGRAPHQL_ANDROID_STUDIO_INTELLIJ_PLUGIN_ID);
                     }
                 }
 
@@ -249,7 +245,7 @@ public class JSGraphQLNodeLanguageServiceInstance implements ProjectManagerListe
             try(OutputStream stream = new FileOutputStream(distJS)) {
                 try(InputStream inputStream = pluginDescriptor.getPluginClassLoader().getResourceAsStream("/META-INF/dist/"+JSGRAPHQL_LANGUAGE_SERVICE_DIST_JS)) {
                     if(inputStream != null) {
-                        IOUtils.copy(inputStream, stream);
+                        ByteStreams.copy(inputStream, stream);
                     } else {
                         log.error("Couldn't load " + JSGRAPHQL_LANGUAGE_SERVICE_DIST_JS + " from " + pluginDescriptor.getPluginClassLoader());
                     }
