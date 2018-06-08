@@ -10,7 +10,7 @@
 <idea-plugin version="2">
   <id>com.intellij.lang.jsgraphql.android.studio</id>
   <name>JS GraphQL - Android Studio</name>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <vendor>Jim Kynde Meyer - jimkyndemeyer@gmail.com</vendor>
 
   <description><![CDATA[

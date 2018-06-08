@@ -24,7 +24,10 @@ It depends on [js-graphql-language-service](https://github.com/jimkyndemeyer/js-
 
 The plugin version for Android Studio is currently considered experimental and has not yet been published to the JetBrains Plugin Repository.
 
-Download the [js-graphql-intellij-plugin.jar](https://github.com/jimkyndemeyer/js-graphql-intellij-plugin/raw/android-studio/android-studio/0.1.0/js-graphql-intellij-plugin.jar) directly from this `android-studio` branch. 
+Download the plugin directly from this `android-studio` branch:
+
+- Android Studio 3.1 or newer: [js-graphql-intellij-plugin.jar](https://github.com/jimkyndemeyer/js-graphql-intellij-plugin/raw/android-studio/android-studio/0.2.0/js-graphql-intellij-plugin.jar)   
+- Earlier version of Android Studio: [js-graphql-intellij-plugin.jar](https://github.com/jimkyndemeyer/js-graphql-intellij-plugin/raw/android-studio/android-studio/0.1.0/js-graphql-intellij-plugin.jar)   
 
 To install it in Android Studio, open "Settings", "Plugins", "Install plugin from disk..."
 
