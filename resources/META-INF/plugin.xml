@@ -10,7 +10,7 @@
 <idea-plugin>
   <id>com.intellij.lang.jsgraphql</id>
   <name>JS GraphQL</name>
-  <version>2.0.0</version>
+  <version>2.0.0-end-of-beta</version>
   <vendor>Jim Kynde Meyer - jimkyndemeyer@gmail.com</vendor>
 
   <description><![CDATA[
@@ -109,6 +109,7 @@
 
     <!-- Startup -->
     <postStartupActivity implementation="com.intellij.lang.jsgraphql.endpoint.ide.startup.GraphQLStartupActivity" />
+    <postStartupActivity implementation="com.intellij.lang.jsgraphql.endpoint.ide.startup.GraphQLBetaEndedStartupActivity" />
     <postStartupActivity implementation="com.intellij.lang.jsgraphql.ide.project.graphqlconfig.GraphQLConfigProjectStartupActivity" />
     <postStartupActivity implementation="com.intellij.lang.jsgraphql.ide.project.relay.GraphQLRelayModernEnableStartupActivity" />
 
