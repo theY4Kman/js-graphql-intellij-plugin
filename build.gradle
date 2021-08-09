@@ -46,7 +46,7 @@ intellij {
         changeNotes = """
             <p><b>New in $pluginVersion</b></p>
             <p>
-            ${changelog.get(pluginVersion.toString()).toHTML()}
+            ${changelog.get(pluginVersion.toString().split("-")[0]).toHTML()}
             </p>
             <br />
             <p>See the <a href="https://github.com/jimkyndemeyer/js-graphql-intellij-plugin/blob/master/CHANGELOG.md">CHANGELOG</a> for more details and history.</p>
@@ -55,7 +55,7 @@ intellij {
 }
 
 runPluginVerifier {
-    ideVersions = ['IU-2021.1', 'IU-2021.2']
+    ideVersions = ['IU-2020.3.1', 'IU-2020.3.4']
 }
 
 runIde {
