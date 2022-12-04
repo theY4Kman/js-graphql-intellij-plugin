@@ -10,7 +10,7 @@ plugins {
     java
     kotlin("jvm") version "1.7.10"
 
-    id("org.jetbrains.intellij") version "1.8.0"
+    id("org.jetbrains.intellij") version "1.10.0"
     id("org.jetbrains.grammarkit") version "2021.2.2"
     id("com.github.ManifestClasspath") version "0.1.0-RELEASE"
     id("org.jetbrains.changelog") version "1.3.1"
@@ -103,9 +103,9 @@ tasks {
 
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "11"
-            languageVersion = "1.5"
-            apiVersion = "1.5"
+            jvmTarget = "17"
+            languageVersion = "1.7"
+            apiVersion = "1.7"
             freeCompilerArgs = listOf("-Xjvm-default=all")
         }
     }
