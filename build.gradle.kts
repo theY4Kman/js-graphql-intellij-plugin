@@ -75,18 +75,23 @@ dependencies {
 
 tasks {
     patchPluginXml {
-        version.set(pluginVersion)
+        val unreleasedItem = changelog.getUnreleased().takeUnless { it.getSections().isEmpty() }
+        val isUnreleased = unreleasedItem != null
+        val pluginVersionSuffix = if (isUnreleased) "-dev" else ""
+
+        version.set(pluginVersion + pluginVersionSuffix)
         sinceBuild.set(pluginSinceBuild)
         untilBuild.set(pluginUntilBuild)
 
-        changeNotes.set(
+        changeNotes.set(provider {
+            val changelogItem = unreleasedItem ?: changelog.getOrNull(pluginVersion) ?: return@provider ""
             """
-            <h2>New in $pluginVersion</h2>
-            ${changelog.get(pluginVersion).toHTML()}
+            <h2>New in ${version}</h2>
+            ${changelogItem.toHTML()}
             <br />
             See the <a href="https://github.com/jimkyndemeyer/js-graphql-intellij-plugin/blob/master/CHANGELOG.md">CHANGELOG</a> for more details and history.
             """.trimIndent()
-        )
+        })
     }
 
     runIde {
