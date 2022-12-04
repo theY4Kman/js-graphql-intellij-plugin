@@ -24,14 +24,14 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 intellij {
     version.set(platformVersion)
     type.set(platformType)
-    plugins.set(listOf("JavaScriptLanguage", "CSS", "IntelliLang", "java"))
+    plugins.set(listOf("JavaScript", "com.intellij.css", "org.intellij.intelliLang", "java"))
     ideaDependencyCachePath.set(project.buildDir.absolutePath)
 }
 
