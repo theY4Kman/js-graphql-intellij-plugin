@@ -1,7 +1,7 @@
 package com.intellij.lang.jsgraphql.schema;
 
 
-import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionSearchHelper;
+import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionHelper;
 import com.intellij.lang.jsgraphql.psi.*;
 import com.intellij.lang.jsgraphql.types.language.*;
 import com.intellij.openapi.util.text.StringUtil;
@@ -784,7 +784,7 @@ public final class GraphQLPsiToLanguage {
         }
 
         String content = description.getText();
-        GraphQLInjectionSearchHelper injectionSearchHelper = GraphQLInjectionSearchHelper.getInstance();
+        GraphQLInjectionHelper injectionSearchHelper = GraphQLInjectionHelper.getInstance();
         if (injectionSearchHelper != null) {
             content = injectionSearchHelper.applyInjectionDelimitingQuotesEscape(content);
         }

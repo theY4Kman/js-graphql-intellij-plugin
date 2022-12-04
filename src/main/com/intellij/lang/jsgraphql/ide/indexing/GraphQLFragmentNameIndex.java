@@ -8,7 +8,7 @@
 package com.intellij.lang.jsgraphql.ide.indexing;
 
 import com.intellij.lang.jsgraphql.GraphQLFileType;
-import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionSearchHelper;
+import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionHelper;
 import com.intellij.lang.jsgraphql.ide.findUsages.GraphQLFindUsagesUtil;
 import com.intellij.lang.jsgraphql.psi.GraphQLDefinition;
 import com.intellij.lang.jsgraphql.psi.GraphQLFragmentDefinition;
@@ -38,7 +38,7 @@ public class GraphQLFragmentNameIndex extends FileBasedIndexExtension<String, Bo
     public static final int VERSION = 1;
 
 
-    private final @Nullable GraphQLInjectionSearchHelper graphQLInjectionSearchHelper;
+    private final @Nullable GraphQLInjectionHelper myGraphQLInjectionHelper;
 
     private final Set<FileType> includedFileTypes;
 
@@ -62,14 +62,12 @@ public class GraphQLFragmentNameIndex extends FileBasedIndexExtension<String, Bo
                             hasFragments.set(true);
                         }
                         return; // no need to visit deeper than definitions since fragments are top level
-                    } else if (element instanceof PsiLanguageInjectionHost && graphQLInjectionSearchHelper != null) {
-                        if (graphQLInjectionSearchHelper.isGraphQLLanguageInjectionTarget(element)) {
-                            final PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(element.getProject());
-                            final String graphqlBuffer = StringUtils.strip(element.getText(), "` \t\n");
-                            final PsiFile graphqlInjectedPsiFile = psiFileFactory.createFileFromText("", GraphQLFileType.INSTANCE, graphqlBuffer, 0, false, false);
+                    } else if (element instanceof PsiLanguageInjectionHost && myGraphQLInjectionHelper != null) {
+                        final PsiFile graphqlInjectedPsiFile = myGraphQLInjectionHelper.createGraphQLFileFromInjectionTarget(element);
+                        if (graphqlInjectedPsiFile != null) {
                             graphqlInjectedPsiFile.accept(identifierVisitor.get());
-                            return;
                         }
+                        return;
                     }
                     super.visitElement(element);
                 }
@@ -85,7 +83,7 @@ public class GraphQLFragmentNameIndex extends FileBasedIndexExtension<String, Bo
 
         };
         includedFileTypes = GraphQLFindUsagesUtil.getService().getIncludedFileTypes();
-        graphQLInjectionSearchHelper = GraphQLInjectionSearchHelper.getInstance();
+        myGraphQLInjectionHelper = GraphQLInjectionHelper.getInstance();
     }
 
     @NotNull

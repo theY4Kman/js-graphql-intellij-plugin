@@ -10,7 +10,7 @@ package com.intellij.lang.jsgraphql.ide.indexing;
 import com.google.common.collect.Maps;
 import com.intellij.json.psi.*;
 import com.intellij.lang.jsgraphql.GraphQLFileType;
-import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionSearchHelper;
+import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionHelper;
 import com.intellij.lang.jsgraphql.ide.findUsages.GraphQLFindUsagesUtil;
 import com.intellij.lang.jsgraphql.psi.GraphQLIdentifier;
 import com.intellij.openapi.fileTypes.FileType;
@@ -36,7 +36,7 @@ public class GraphQLIdentifierIndex extends FileBasedIndexExtension<String, Grap
     public static final ID<String, IdentifierKind> NAME = ID.create("GraphQLIdentifierIndex");
     public static final int VERSION = 3;
 
-    private final @Nullable GraphQLInjectionSearchHelper graphQLInjectionSearchHelper;
+    private final @Nullable GraphQLInjectionHelper myGraphQLInjectionHelper;
 
     private final Set<FileType> includedFileTypes;
 
@@ -88,14 +88,12 @@ public class GraphQLIdentifierIndex extends FileBasedIndexExtension<String, Grap
                                 }
                             }
                         }
-                    } else if (element instanceof PsiLanguageInjectionHost && graphQLInjectionSearchHelper != null) {
-                        if (graphQLInjectionSearchHelper.isGraphQLLanguageInjectionTarget(element)) {
-                            final PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(element.getProject());
-                            final String graphqlBuffer = StringUtils.strip(element.getText(), "` \t\n");
-                            final PsiFile graphqlInjectedPsiFile = psiFileFactory.createFileFromText("", GraphQLFileType.INSTANCE, graphqlBuffer, 0, false, false);
+                    } else if (element instanceof PsiLanguageInjectionHost && myGraphQLInjectionHelper != null) {
+                        final PsiFile graphqlInjectedPsiFile = myGraphQLInjectionHelper.createGraphQLFileFromInjectionTarget(element);
+                        if (graphqlInjectedPsiFile != null) {
                             graphqlInjectedPsiFile.accept(this);
-                            return;
                         }
+                        return;
                     }
                     super.visitElement(element);
                 }
@@ -106,7 +104,7 @@ public class GraphQLIdentifierIndex extends FileBasedIndexExtension<String, Grap
             return identifiers;
         };
         includedFileTypes = GraphQLFindUsagesUtil.getService().getIncludedFileTypes();
-        graphQLInjectionSearchHelper = GraphQLInjectionSearchHelper.getInstance();
+        myGraphQLInjectionHelper = GraphQLInjectionHelper.getInstance();
     }
 
     private boolean isIntrospectionJsonFile(JsonFile jsonFile) {

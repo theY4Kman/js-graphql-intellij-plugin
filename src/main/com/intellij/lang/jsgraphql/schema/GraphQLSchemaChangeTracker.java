@@ -10,7 +10,7 @@ package com.intellij.lang.jsgraphql.schema;
 import com.google.common.collect.Lists;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.lang.jsgraphql.endpoint.psi.JSGraphQLEndpointFile;
-import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionSearchHelper;
+import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionHelper;
 import com.intellij.lang.jsgraphql.ide.project.graphqlconfig.GraphQLConfigManager;
 import com.intellij.lang.jsgraphql.psi.GraphQLFile;
 import com.intellij.lang.jsgraphql.psi.GraphQLFragmentDefinition;
@@ -104,8 +104,8 @@ public class GraphQLSchemaChangeTracker implements Disposable {
                 schemaChanged();
             }
             if (event.getParent() instanceof PsiLanguageInjectionHost) {
-                GraphQLInjectionSearchHelper graphQLInjectionSearchHelper = GraphQLInjectionSearchHelper.getInstance();
-                if (graphQLInjectionSearchHelper != null && graphQLInjectionSearchHelper.isGraphQLLanguageInjectionTarget(event.getParent())) {
+                GraphQLInjectionHelper graphQLInjectionHelper = GraphQLInjectionHelper.getInstance();
+                if (graphQLInjectionHelper != null && graphQLInjectionHelper.isGraphQLLanguageInjectionTarget(event.getParent())) {
                     // change in injection target
                     schemaChanged();
                 }

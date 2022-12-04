@@ -38,6 +38,8 @@
   <extensionPoints>
     <extensionPoint name="findUsagesFileTypeContributor" dynamic="true"
                     interface="com.intellij.lang.jsgraphql.ide.findUsages.GraphQLFindUsagesFileTypeContributor"/>
+    <extensionPoint name="injectionHelperExtension" dynamic="true"
+                    interface="com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionHelperExtension"/>
     <extensionPoint name="errorFilter" dynamic="true"
                     interface="com.intellij.lang.jsgraphql.ide.validation.GraphQLErrorFilter"/>
   </extensionPoints>

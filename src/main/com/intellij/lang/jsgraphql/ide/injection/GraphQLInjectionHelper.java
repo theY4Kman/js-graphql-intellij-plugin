@@ -7,6 +7,7 @@
  */
 package com.intellij.lang.jsgraphql.ide.injection;
 
+import com.intellij.lang.jsgraphql.psi.GraphQLFile;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -15,16 +16,24 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Processor;
 import org.jetbrains.annotations.Nullable;
 
-public interface GraphQLInjectionSearchHelper {
+public interface GraphQLInjectionHelper {
 
-    static @Nullable GraphQLInjectionSearchHelper getInstance() {
-        return ApplicationManager.getApplication().getService(GraphQLInjectionSearchHelper.class);
+    static @Nullable GraphQLInjectionHelper getInstance() {
+        return ApplicationManager.getApplication().getService(GraphQLInjectionHelper.class);
     }
 
     /**
      * Gets whether the specified host is a target for GraphQL Injection
      */
     boolean isGraphQLLanguageInjectionTarget(PsiElement host);
+
+    /**
+     * Extract GraphQL source from a GraphQL Injection target and create a corresponding GraphQL PsiFile
+     *
+     * @param host the target for GraphQL Injection
+     * @return a GraphQL PsiFile generated from the extracted GraphQL source
+     */
+    @Nullable GraphQLFile createGraphQLFileFromInjectionTarget(PsiElement host);
 
     /**
      * Process injected GraphQL PsiFiles

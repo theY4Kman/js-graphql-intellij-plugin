@@ -5,11 +5,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-package com.intellij.lang.jsgraphql.ide.indexing.javascript;
+package com.intellij.lang.jsgraphql.ide.injection;
 
 import com.intellij.lang.injection.InjectedLanguageManager;
+import com.intellij.lang.jsgraphql.ide.findUsages.GraphQLFindUsagesFileTypeContributor;
+import com.intellij.lang.jsgraphql.ide.indexing.javascript.GraphQLInjectionIndex;
 import com.intellij.lang.jsgraphql.ide.injection.javascript.GraphQLLanguageInjectionUtil;
-import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionSearchHelper;
+import com.intellij.lang.jsgraphql.psi.GraphQLFile;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -20,14 +22,37 @@ import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 
-public class GraphQLJavaScriptInjectionSearchHelper implements GraphQLInjectionSearchHelper {
+public class GraphQLInjectionHelperImpl implements GraphQLInjectionHelper {
 
     @Override
     public boolean isGraphQLLanguageInjectionTarget(PsiElement host) {
-        return GraphQLLanguageInjectionUtil.isGraphQLLanguageInjectionTarget(host);
+        final GraphQLInjectionHelperExtension[] extensions = GraphQLInjectionHelperExtension.EP_NAME.getExtensions();
+        for (GraphQLInjectionHelperExtension extension : extensions) {
+            if (extension.isGraphQLLanguageInjectionTarget(host)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public @Nullable GraphQLFile createGraphQLFileFromInjectionTarget(PsiElement host) {
+        final GraphQLInjectionHelperExtension[] extensions = GraphQLInjectionHelperExtension.EP_NAME.getExtensions();
+        for (GraphQLInjectionHelperExtension extension : extensions) {
+            if (!extension.isGraphQLLanguageInjectionTarget(host)) {
+                continue;
+            }
+
+            final GraphQLFile file = extension.createGraphQLFileFromInjectionTarget(host);
+            if (file != null) {
+                return file;
+            }
+        }
+        return null;
     }
 
     /**
@@ -47,7 +72,7 @@ public class GraphQLJavaScriptInjectionSearchHelper implements GraphQLInjectionS
                     fileWithInjection.accept(new PsiRecursiveElementVisitor() {
                         @Override
                         public void visitElement(@NotNull PsiElement element) {
-                            if (GraphQLLanguageInjectionUtil.isGraphQLLanguageInjectionTarget(element)) {
+                            if (isGraphQLLanguageInjectionTarget(element)) {
                                 injectedLanguageManager.enumerate(element, (injectedPsi, places) -> processor.process(injectedPsi));
                             } else {
                                 // visit deeper until injection found

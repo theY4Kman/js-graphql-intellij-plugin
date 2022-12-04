@@ -19,7 +19,7 @@ import com.intellij.lang.jsgraphql.GraphQLLanguage;
 import com.intellij.lang.jsgraphql.ide.findUsages.GraphQLFindUsagesUtil;
 import com.intellij.lang.jsgraphql.ide.indexing.GraphQLFragmentNameIndex;
 import com.intellij.lang.jsgraphql.ide.indexing.GraphQLIdentifierIndex;
-import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionSearchHelper;
+import com.intellij.lang.jsgraphql.ide.injection.GraphQLInjectionHelper;
 import com.intellij.lang.jsgraphql.ide.introspection.GraphQLIntrospectionFilesManager;
 import com.intellij.lang.jsgraphql.ide.project.graphqlconfig.GraphQLConfigManager;
 import com.intellij.lang.jsgraphql.ide.search.scope.GraphQLMetaInfSchemaSearchScope;
@@ -71,7 +71,7 @@ public class GraphQLPsiSearchHelper implements Disposable {
     private final Map<String, GlobalSearchScope> myFileNameToSchemaScope = Maps.newConcurrentMap();
     private final GraphQLFile myDefaultProjectFile;
     private final PsiManager myPsiManager;
-    private final @Nullable GraphQLInjectionSearchHelper myInjectionSearchHelper;
+    private final @Nullable GraphQLInjectionHelper myInjectionSearchHelper;
     private final InjectedLanguageManager myInjectedLanguageManager;
     // enabled by default, can be disabled using the registry key in case of any problems on the user's side
     private volatile boolean myShouldSearchInLibraries;
@@ -83,7 +83,7 @@ public class GraphQLPsiSearchHelper implements Disposable {
     public GraphQLPsiSearchHelper(@NotNull final Project project) {
         myProject = project;
         myPsiManager = PsiManager.getInstance(myProject);
-        myInjectionSearchHelper = GraphQLInjectionSearchHelper.getInstance();
+        myInjectionSearchHelper = GraphQLInjectionHelper.getInstance();
         myInjectedLanguageManager = InjectedLanguageManager.getInstance(myProject);
         myConfigManager = GraphQLConfigManager.getService(myProject);
 

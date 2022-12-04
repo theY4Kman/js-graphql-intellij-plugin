@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+### Added
+- Support custom GraphQL language injections
+
 ## [3.3.0] - 2022-09-22
 
 ### Fixed
